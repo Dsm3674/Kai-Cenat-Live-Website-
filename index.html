@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kai Cenat Live — Status & Alerts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0b10;
+      --panel: #15161a;
+      --text: #e9ecf1;
+      --muted: #aab2bf;
+      --accent: #9147ff;
+      --live: #ff3b3b;
+      --ok: #16a34a;
+      --card: #0f1115;
+      --border: #22242b;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(80rem 80rem at 20% -10%, #1b1131 0%, var(--bg) 40%), var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand .logo {
+      width: 42px; height: 42px; border-radius: 10px;
+      display: grid; place-items: center;
+      background: linear-gradient(145deg, var(--accent), #6b32c9);
+      box-shadow: 0 10px 30px rgba(145,71,255,.35);
+      font-weight: 800;
+    }
+    .brand h1 { font-size: 20px; margin: 0; letter-spacing: .3px; }
+
+    .pill {
+      font-size: 12px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted);
+      background: rgba(255,255,255,.02);
+    }
+
+    .grid {
+      margin-top: 28px;
+      display: grid; gap: 16px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+    .card {
+      grid-column: span 12;
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px;
+      box-shadow: 0 6px 24px rgba(0,0,0,.25);
+    }
+    @media (min-width: 820px) {
+      .card.halves { grid-column: span 6; }
+    }
+
+    .banner {
+      display: none;
+      border-radius: 14px; padding: 18px 16px; margin: 18px 0 4px;
+      font-weight: 600; letter-spacing: .2px;
+    }
+    .banner.live { display: block; background: linear-gradient(90deg, var(--live), #ff6b6b); color: white; }
+    .banner.off { display: block; background: linear-gradient(90deg, #24262d, #171920); color: var(--muted); }
+
+    .row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .row strong { font-size: 14px; letter-spacing: .3px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+    .kpi {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px;
+    }
+    .kpi .tile { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .kpi .label { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+    .kpi .value { font-size: 20px; font-weight: 700; }
+
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; }
+    button, input {
+      background: var(--card); color: var(--text);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 10px 12px; font-size: 14px;
+    }
+    button { cursor: pointer; }
+    button.primary { background: linear-gradient(180deg, var(--accent), #6b32c9); border: none; box-shadow: 0 10px 24px rgba(145,71,255,.3); }
+
+    footer { margin-top: 40px; color: var(--muted); font-size: 12px; text-align: center; }
+    a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">KC</div>
+        <h1>Kai Cenat — Live Status</h1>
+      </div>
+      <div class="pill" id="lastUpdated">Last updated: —</div>
+    </header>
+
+    <div class="grid">
+      <section class="card" id="statusCard">
+        <div id="liveBanner" class="banner off">⚫ Currently OFFLINE</div>
+        <div class="row">
+          <strong>Channel</strong>
+          <span class="mono" id="channelName">kaicenat</span>
+          <span class="pill" id="gameName">—</span>
+        </div>
+        <div class="kpi">
+          <div class="tile"><div class="label">Viewers</div><div class="value" id="viewerCount">0</div></div>
+          <div class="tile"><div class="label">Uptime</div><div class="value" id="uptime">0m</div></div>
+          <div class="tile"><div class="label">Title</div><div class="value" id="title">—</div></div>
+          <div class="tile"><div class="label">Status</div><div class="value" id="statusTxt">Offline</div></div>
+        </div>
+      </section>
+
+      <section class="card halves">
+        <h3 style="margin:0 0 10px 0;">Controls</h3>
+        <div class="controls">
+          <input id="inputUser" placeholder="twitch username" value="kaicenat" />
+          <button id="btnApply">Apply</button>
+          <button id="btnRefresh">Refresh Now</button>
+        </div>
+      </section>
+
+      <section class="card halves">
+        <h3 style="margin:0 0 10px 0;">API Settings</h3>
+        <div class="controls">
+          <input id="clientId" placeholder="Client ID" />
+          <input id="accessToken" placeholder="Access Token (Bearer)" />
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      Built for quick status checks. Uses Twitch Helix API.<br>
+      Repository: <a href="https://github.com/Dsm3674/Kai-Cenat-Live">github.com/Dsm3674/Kai-Cenat-Live</a><br>
+      Created by <a href="https://github.com/Dsm3674">@Dsm3674</a>
+    </footer>
+  </div>
+
+  <script>
+    const els = {
+      liveBanner: document.getElementById('liveBanner'),
+      channelName: document.getElementById('channelName'),
+      gameName: document.getElementById('gameName'),
+      viewerCount: document.getElementById('viewerCount'),
+      uptime: document.getElementById('uptime'),
+      title: document.getElementById('title'),
+      statusTxt: document.getElementById('statusTxt'),
+      lastUpdated: document.getElementById('lastUpdated'),
+      inputUser: document.getElementById('inputUser'),
+      btnApply: document.getElementById('btnApply'),
+      btnRefresh: document.getElementById('btnRefresh'),
+      clientId: document.getElementById('clientId'),
+      accessToken: document.getElementById('accessToken'),
+    };
+
+    let state = {
+      user: 'kaicenat',
+      clientId: '',
+      accessToken: ''
+    };
+
+    function fmtTime(iso) {
+      if (!iso) return '0m';
+      const start = new Date(iso);
+      const now = new Date();
+      const diff = Math.max(0, (now - start) / 1000);
+      const h = Math.floor(diff / 3600);
+      const m = Math.floor((diff % 3600) / 60);
+      return h ? `${h}h ${m}m` : `${m}m`;
+    }
+
+    async function fetchStream(user) {
+      if (!state.clientId || !state.accessToken) return { ok:false, data:null };
+      const res = await fetch(`https://api.twitch.tv/helix/streams?user_login=${encodeURIComponent(user)}` ,{
+        headers: { 'Client-ID': state.clientId, 'Authorization': `Bearer ${state.accessToken}` }
+      });
+      if (!res.ok) return { ok:false, data:null };
+      const json = await res.json();
+      return { ok:true, data: json };
+    }
+
+    async function refresh() {
+      const { ok, data } = await fetchStream(state.user);
+      const nowStr = new Date().toLocaleString();
+      els.lastUpdated.textContent = `Last updated: ${nowStr}`;
+
+      if (!ok || !data) {
+        els.liveBanner.className = 'banner off';
+        els.statusTxt.textContent = 'Offline';
+        els.viewerCount.textContent = '0';
+        els.uptime.textContent = '0m';
+        els.title.textContent = '—';
+        els.gameName.textContent = '—';
+        return;
+      }
+
+      const live = Array.isArray(data.data) && data.data.length ? data.data[0] : null;
+      if (live) {
+        els.liveBanner.className = 'banner live';
+        els.liveBanner.textContent = `🔴 ${state.user} is LIVE on Twitch!`;
+        els.statusTxt.textContent = 'Live';
+        els.channelName.textContent = live.user_login || state.user;
+        els.viewerCount.textContent = live.viewer_count?.toLocaleString?.() || '—';
+        els.uptime.textContent = fmtTime(live.started_at);
+        els.title.textContent = live.title || '—';
+        els.gameName.textContent = live.game_name || '—';
+      } else {
+        els.liveBanner.className = 'banner off';
+        els.liveBanner.textContent = '⚫ Currently OFFLINE';
+        els.statusTxt.textContent = 'Offline';
+        els.viewerCount.textContent = '0';
+        els.uptime.textContent = '0m';
+        els.title.textContent = '—';
+        els.gameName.textContent = '—';
+      }
+    }
+
+    els.btnApply.addEventListener('click', () => {
+      state.user = els.inputUser.value.trim() || 'kaicenat';
+      state.clientId = els.clientId.value.trim();
+      state.accessToken = els.accessToken.value.trim();
+      refresh();
+    });
+
+    els.btnRefresh.addEventListener('click', refresh);
+
+    setInterval(refresh, 60_000);
+  </script>
+</body>
+</html>
