@@ -2,198 +2,581 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kai Cenat Live Checker</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1"
+  />
+  <title>Kai Cenat Live — Control Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+    rel="stylesheet"
+  />
   <style>
-    :root {
-      --bg: #0b0b10;
-      --panel: #15161a;
-      --text: #e9ecf1;
-      --muted: #aab2bf;
-      --accent: #9147ff;
-      --live: #ff3b3b;
-      --border: #23242b;
-    }
-    * { box-sizing: border-box; }
+ 
 
-    body {
-      background: radial-gradient(100rem 80rem at 30% -10%, #1b1131 0%, var(--bg) 40%), var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 900px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-      padding: 40px 30px 60px;
-      text-align: center;
-      backdrop-filter: blur(16px);
+    :root{
+      --bg-0:#07070a;
+      --bg-1:#0c0b18;
+      --bg-2:#131224;
+      --ink:#e9eef6;
+      --muted:#9aa3b2;
+      --border:#222236;
+      --accent:#8c5bff;     /* purple */
+      --accent-2:#21d4fd;   /* cyan */
+      --accent-hot:#ff3566; /* live hot pink */
+      --glow: rgba(140,91,255,.45);
+      --glow-2: rgba(33,212,253,.45);
+      --ok:#20c997;
+      --warn:#ffb020;
+      --danger:#ff5b6b;
+      --card:#12111e;
+      --chip:#171630;
+      --rail:#0e0d18;
+      --shadow: 0 18px 60px rgba(0,0,0,.50);
+      --round: 18px;
+      --round-sm: 12px;
+      --ring: 0 0 0 1px var(--border) inset;
     }
 
-    h1 {
-      font-size: 1.8em;
-      font-weight: 700;
-      margin: 0;
-      color: var(--accent);
-      letter-spacing: 0.5px;
+    /* Reset / base */
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      color:var(--ink);
+      background: radial-gradient(1200px 900px at 10% -10%, #1f0f40 0%, transparent 40%),
+                  radial-gradient(1000px 700px at 110% 10%, #072b3b 0%, transparent 42%),
+                  linear-gradient(160deg, var(--bg-1), var(--bg-0) 40%, var(--bg-2));
+      overflow-x:hidden;
     }
 
-    p.subtitle {
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 8px;
+    /* Particle field (canvas) backdrop */
+    #fx{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      opacity:.25;
+      pointer-events:none;
+      filter: blur(.3px) contrast(120%);
     }
 
-    #liveBanner {
-      display: none;
-      margin: 30px auto 20px;
-      background: linear-gradient(90deg, var(--live), #ff6b6b);
-      padding: 18px;
-      border-radius: 10px;
-      font-size: 18px;
-      font-weight: 600;
-      width: fit-content;
-      animation: pulse 2s infinite;
+    /* Layout shell */
+    .wrap{
+      position:relative;
+      z-index:1;
+      max-width:1100px;
+      margin:0 auto;
+      padding:56px 18px 96px;
     }
 
-    @keyframes pulse {
-      0%,100% { opacity: 0.85; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.04); }
+    /* Brand row */
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+    .logo{
+      display:flex;align-items:center;gap:12px;
+    }
+    .badge{
+      width:46px;height:46px;border-radius:12px;
+      display:grid;place-items:center;
+      background: conic-gradient(from 210deg at 50% 50%, var(--accent), #6f3cff 35%, var(--accent-2));
+      box-shadow: 0 0 0 2px rgba(255,255,255,.05) inset, 0 12px 36px var(--glow);
+      font-weight:800; letter-spacing:.5px;
+    }
+    .title{
+      display:flex;flex-direction:column;
+      line-height:1.05;
+    }
+    .title h1{
+      margin:0;font-size:26px;letter-spacing:.3px;
+    }
+    .title span{
+      color:var(--muted);font-size:13px;margin-top:6px;
     }
 
-    .setup {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 25px;
-      text-align: left;
+    .stamp{
+      font-size:12px;color:var(--muted);
+      padding:8px 12px;border-radius:999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      box-shadow: var(--ring);
     }
 
-    .setup h2 {
-      margin: 0 0 10px;
-      font-size: 16px;
-      color: var(--accent);
+    /* Energy rail (unique accent) */
+    .rail{
+      position:relative;
+      height:6px;border-radius:999px;
+      margin:18px 0 26px;
+      background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      box-shadow: var(--ring), inset 0 1px 0 rgba(255,255,255,.06);
+      overflow:hidden;
+    }
+    .rail::before{
+      content:"";
+      position:absolute;inset:0;
+      background:
+        linear-gradient(90deg,
+          transparent 0%,
+          rgba(140,91,255,.65) 10%,
+          rgba(33,212,253,.55) 20%,
+          transparent 30%),
+        linear-gradient(90deg,
+          transparent 40%,
+          rgba(255,53,102,.55) 50%,
+          rgba(140,91,255,.45) 60%,
+          transparent 72%);
+      filter: blur(4px);
+      animation: slide 6s linear infinite;
+    }
+    @keyframes slide{
+      0% { transform: translateX(-40%); }
+      100% { transform: translateX(40%); }
     }
 
-    ol {
-      margin: 0 0 15px 20px;
-      padding: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.6;
+    /* Grid layout */
+    .grid{
+      display:grid;gap:18px;
+      grid-template-columns: repeat(12, 1fr);
     }
 
-    .inputs {
-      text-align: center;
+    /* Card base */
+    .card{
+      grid-column: span 12;
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+      border-radius: var(--round);
+      padding:22px;
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .card::after{
+      /* subtle inner top highlight */
+      content:""; position:absolute; left:0; right:0; top:0; height:1px;
+      background: linear-gradient(90deg, rgba(255,255,255,.35), rgba(255,255,255,0), rgba(255,255,255,.35));
+      opacity:.08;
     }
 
-    input {
-      width: 280px;
-      margin: 5px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #1a1b1f;
-      color: white;
-      font-size: 14px;
+    @media(min-width:880px){
+      .half{ grid-column: span 6; }
+      .third{ grid-column: span 4; }
+      .two{ grid-column: span 8; }
     }
 
-    button {
-      background: linear-gradient(90deg, var(--accent), #6b32c9);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      box-shadow: 0 6px 20px rgba(145,71,255,.35);
-      transition: all 0.2s ease;
+    /* Live banner with pulse bar */
+    .liveBanner{
+      display:none;
+      border-radius:14px;
+      padding:16px 16px 18px;
+      font-weight:700; letter-spacing:.2px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.03)),
+        linear-gradient(90deg, var(--accent-hot), #ff7a9a);
+      color:#fff;
+      box-shadow: 0 8px 26px rgba(255,53,102,.35);
+      position:relative;
+      overflow:hidden;
     }
-    button:hover { opacity: 0.9; transform: translateY(-2px); }
-
-    footer {
-      margin-top: 30px;
-      color: var(--muted);
-      font-size: 13px;
+    .liveBanner .bar{
+      position:absolute; left:0; right:0; top:0; height:3px;
+      background: linear-gradient(90deg, #fff, rgba(255,255,255,0));
+      opacity:.75; filter: blur(.7px);
+      animation: sweep 2.2s ease-in-out infinite;
+    }
+    @keyframes sweep{
+      0%{ transform: translateX(-60%); }
+      50%{ transform: translateX(0%); }
+      100%{ transform: translateX(60%); }
     }
 
-    a { color: var(--accent); text-decoration: none; }
+    .offBanner{
+      display:none;
+      border-radius:14px;
+      padding:16px 16px 18px;
+      font-weight:600; letter-spacing:.2px;
+      color:var(--muted);
+      background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px dashed rgba(255,255,255,.08);
+    }
+
+    /* KPIs */
+    .kpis{
+      display:grid; gap:12px; margin-top:14px;
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .tile{
+      border-radius:14px; padding:14px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+    }
+    .label{ font-size:12px; color:var(--muted); }
+    .value{ font-size:22px; font-weight:800; margin-top:4px; }
+
+    /* Controls */
+    .controls{ display:flex; flex-wrap:wrap; gap:10px; }
+    .control-title{ font-weight:700; letter-spacing:.2px; margin-bottom:8px; }
+    input, button{
+      border-radius:12px; border:1px solid var(--border);
+      background: var(--chip); color:var(--ink); padding:11px 12px;
+      font-size:14px;
+      transition: box-shadow .2s, transform .2s, border-color .2s;
+    }
+    input{ min-width:260px; }
+    input:focus{ outline:none; border-color:var(--accent); box-shadow: 0 0 0 2px rgba(140,91,255,.25); }
+    button{ cursor:pointer; }
+    .primary{
+      background: linear-gradient(180deg, var(--accent), #6f3cff);
+      border:none; box-shadow: 0 12px 30px var(--glow);
+      font-weight:700;
+    }
+    .ghost{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    }
+    button:hover{ transform: translateY(-1px); }
+    button:active{ transform: translateY(0); }
+
+    /* Setup list */
+    .steps{
+      margin: 4px 0 0 16px; padding:0; color:var(--muted);
+      font-size:14px; line-height:1.6;
+    }
+    .steps a{ color:var(--accent-2); text-decoration:none; }
+    .steps a:hover{ text-decoration:underline; }
+
+    /* Sub headers */
+    .h3{
+      margin:0 0 8px 0; font-size:16px; letter-spacing:.2px;
+      color:#cfe7ff; font-weight:800;
+      text-shadow: 0 0 18px rgba(33,212,253,.12);
+    }
+
+    /* Subtle decorative corner glow on cards */
+    .card .glow{
+      position:absolute; width:120px; height:120px; border-radius:50%;
+      right:-40px; top:-40px; opacity:.18; filter: blur(16px);
+      background: radial-gradient(circle at 50% 50%, var(--accent), transparent 70%);
+      pointer-events:none;
+    }
+
+    /* Footer */
+    footer{
+      text-align:center; color:var(--muted);
+      margin-top:28px; font-size:12px;
+    }
+    footer a{ color:var(--accent-2); text-decoration:none; }
+    footer a:hover{ text-decoration:underline; }
+
+    /* Micro interactions / helpers */
+    .fadeIn{
+      animation: fade .75s ease both;
+    }
+    @keyframes fade{
+      from{ opacity:0; transform: translateY(6px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+
+    /* Responsive fine-tuning */
+    @media (max-width: 520px){
+      .title h1{ font-size:22px; }
+      input{ min-width:100%; }
+      .kpis{ grid-template-columns: 1fr; }
+    }
+
+    /* Tooltip (for tiny help badges) */
+    .tip{
+      position:relative; display:inline-flex; align-items:center; gap:6px;
+      color:var(--muted); font-size:12px;
+    }
+    .tip .dot{
+      width:8px;height:8px;border-radius:999px;background:var(--accent-2);
+      box-shadow: 0 0 14px var(--glow-2);
+      display:inline-block;
+    }
+
+    /* Divider */
+    .divider{
+      height:1px; margin:14px 0;
+      background: linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+    }
+
+    /* Link chips */
+    .chip-link{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      border:1px solid var(--border); color:#d4e5ff;text-decoration:none;
+      font-size:12px; letter-spacing:.2px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .chip-link:hover{ transform: translateY(-1px); box-shadow: 0 12px 26px rgba(33,212,253,.18); }
+
+    /* Mini status dot */
+    .status-dot{
+      width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px;
+      box-shadow: 0 0 12px rgba(255,255,255,.18);
+    }
+    .dot-live{ background: var(--accent-hot); box-shadow: 0 0 18px rgba(255,53,102,.6); }
+    .dot-off{ background: #4a4f63; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Kai Cenat Live Checker</h1>
-    <p class="subtitle">Monitor Twitch streamers in real time — no setup required.</p>
+  <canvas id="fx"></canvas>
 
-    <div id="liveBanner">🔴 Kai Cenat is LIVE right now!</div>
-
-    <div class="setup">
-      <h2>⚙️ Quick Setup</h2>
-      <ol>
-        <li>Visit <a href="https://dev.twitch.tv/console/apps" target="_blank">Twitch Developer Console</a>.</li>
-        <li>Create or open your Twitch app to get a <b>Client ID</b> and <b>Client Secret</b>.</li>
-        <li>Use <a href="https://twitchtokengenerator.com" target="_blank">twitchtokengenerator.com</a> to get an <b>Access Token</b>.</li>
-        <li>Paste them below and click <b>Check Stream</b>.</li>
-      </ol>
-
-      <div class="inputs">
-        <input id="clientId" placeholder="Client ID" /><br />
-        <input id="accessToken" placeholder="Access Token (Bearer)" /><br />
-        <button id="checkButton">Check Stream</button>
+  <div class="wrap">
+    <!-- Brand -->
+    <div class="brand">
+      <div class="logo">
+        <div class="badge">KC</div>
+        <div class="title">
+          <h1>Kai Cenat — Live Control Panel</h1>
+          <span>Real-time Twitch status with sleek UI and built-in setup.</span>
+        </div>
       </div>
+      <div class="stamp" id="lastUpdated">Last updated: —</div>
+    </div>
+
+    <!-- Energy Rail -->
+    <div class="rail"></div>
+
+    <!-- Grid -->
+    <div class="grid">
+
+      <!-- STATUS CARD -->
+      <section class="card two fadeIn" id="statusCard">
+        <div class="glow"></div>
+
+        <div id="liveBanner" class="liveBanner">
+          <div class="bar"></div>
+          <span class="status">
+            <span class="status-dot dot-live"></span>
+            <strong id="statusTxt">🔴 LIVE</strong>
+          </span>
+          <div class="kpis">
+            <div class="tile">
+              <div class="label">Channel</div>
+              <div class="value" id="channelName">kaicenat</div>
+            </div>
+            <div class="tile">
+              <div class="label">Viewers</div>
+              <div class="value" id="viewerCount">—</div>
+            </div>
+            <div class="tile">
+              <div class="label">Uptime</div>
+              <div class="value" id="uptime">—</div>
+            </div>
+            <div class="tile">
+              <div class="label">Game</div>
+              <div class="value" id="gameName">—</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="label">Title</div>
+          <div class="value" id="title" style="font-size:16px;font-weight:600;">—</div>
+        </div>
+
+        <div id="offBanner" class="offBanner">
+          <span class="status">
+            <span class="status-dot dot-off"></span>
+            <strong id="statusTxtOff">⚫ Offline</strong>
+          </span>
+          <div class="label" style="margin-top:8px;">Kai is currently not live. Try again later.</div>
+        </div>
+      </section>
+
+      <!-- CONTROLS -->
+      <section class="card half fadeIn">
+        <div class="h3">Controls</div>
+        <div class="controls">
+          <input id="inputUser" placeholder="Twitch username" value="kaicenat" />
+          <button id="btnApply" class="ghost">Apply</button>
+          <button id="btnRefresh" class="primary">Refresh Now</button>
+        </div>
+        <div class="divider"></div>
+        <div class="tip"><span class="dot"></span>Tip: Add other creators like <code style="background:#0a0a12;padding:2px 6px;border-radius:6px;border:1px solid #1e1f2f">ishowspeed</code>.</div>
+      </section>
+
+      <!-- API SETTINGS + SETUP -->
+      <section class="card half fadeIn">
+        <div class="h3">API Setup</div>
+        <div class="controls" style="margin-bottom:8px;">
+          <input id="clientId" placeholder="Client ID" />
+          <input id="accessToken" placeholder="Access Token (Bearer)" />
+        </div>
+        <div class="controls">
+          <a class="chip-link" href="https://dev.twitch.tv/console/apps" target="_blank">Twitch Developer Console</a>
+          <a class="chip-link" href="https://twitchtokengenerator.com" target="_blank">Token Generator</a>
+          <button id="btnTest" class="ghost">Test Credentials</button>
+        </div>
+        <div class="divider"></div>
+        <div class="h3">Quick Setup</div>
+        <ol class="steps">
+          <li>Create a Twitch App → copy <strong>Client ID</strong> & <strong>Client Secret</strong>.</li>
+          <li>Use Token Generator → get an <strong>Access Token</strong>.</li>
+          <li>Paste credentials above and press <strong>Refresh Now</strong>.</li>
+        </ol>
+      </section>
+
     </div>
 
     <footer>
-      Created by <strong>Dsm3674</strong> • <a href="https://github.com/Dsm3674/Kai-Cenat-Live" target="_blank">View on GitHub</a>
+      Built by <a href="https://github.com/Dsm3674" target="_blank">@Dsm3674</a> •
+      Source: <a href="https://github.com/Dsm3674/Kai-Cenat-Live" target="_blank">GitHub</a>
     </footer>
   </div>
 
   <script>
-    const userLogin = 'kaicenat';
-    const banner = document.getElementById('liveBanner');
-    const btn = document.getElementById('checkButton');
+    /* =========================
+       Particle field background
+       ========================= */
+    (function(){
+      const c = document.getElementById('fx');
+      const ctx = c.getContext('2d');
+      let w,h,parts=[];
+      const N = 80;
 
-    btn.addEventListener('click', async () => {
-      const clientId = document.getElementById('clientId').value.trim();
-      const accessToken = document.getElementById('accessToken').value.trim();
-      if (!clientId || !accessToken) {
-        alert('Please enter both Client ID and Access Token.');
+      function resize(){
+        w = c.width = window.innerWidth;
+        h = c.height = window.innerHeight;
+        parts = new Array(N).fill(0).map(()=>({
+          x: Math.random()*w,
+          y: Math.random()*h,
+          r: Math.random()*1.8+0.4,
+          vx: (Math.random()-0.5)*0.25,
+          vy: (Math.random()-0.5)*0.25,
+          a: Math.random()*0.6+0.2
+        }));
+      }
+      function step(){
+        ctx.clearRect(0,0,w,h);
+        for(const p of parts){
+          p.x += p.vx; p.y += p.vy;
+          if(p.x<0||p.x>w) p.vx*=-1;
+          if(p.y<0||p.y>h) p.vy*=-1;
+          const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*4);
+          g.addColorStop(0, "rgba(140,91,255,"+p.a+")");
+          g.addColorStop(1, "rgba(33,212,253,0)");
+          ctx.fillStyle=g;
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+        }
+        requestAnimationFrame(step);
+      }
+      window.addEventListener('resize', resize);
+      resize(); step();
+    })();
+
+    /* =========================
+       App logic
+       ========================= */
+    const els = {
+      liveBanner: document.getElementById('liveBanner'),
+      offBanner: document.getElementById('offBanner'),
+      channelName: document.getElementById('channelName'),
+      gameName: document.getElementById('gameName'),
+      viewerCount: document.getElementById('viewerCount'),
+      uptime: document.getElementById('uptime'),
+      title: document.getElementById('title'),
+      statusTxt: document.getElementById('statusTxt'),
+      lastUpdated: document.getElementById('lastUpdated'),
+      inputUser: document.getElementById('inputUser'),
+      btnApply: document.getElementById('btnApply'),
+      btnRefresh: document.getElementById('btnRefresh'),
+      clientId: document.getElementById('clientId'),
+      accessToken: document.getElementById('accessToken'),
+      btnTest: document.getElementById('btnTest'),
+    };
+
+    let state = {
+      user: 'kaicenat',
+      clientId: '',
+      accessToken: ''
+    };
+
+    function fmtTime(iso){
+      if(!iso) return '0m';
+      const start = new Date(iso);
+      const diff = Math.max(0, (Date.now()-start.getTime())/1000);
+      const h = Math.floor(diff/3600);
+      const m = Math.floor((diff%3600)/60);
+      return h ? `${h}h ${m}m` : `${m}m`;
+    }
+
+    async function fetchStream(user){
+      if(!state.clientId || !state.accessToken){
+        return { ok:false, data:null, statusText: 'Missing Client ID or Access Token' };
+      }
+      const res = await fetch(`https://api.twitch.tv/helix/streams?user_login=${encodeURIComponent(user)}`,{
+        headers:{
+          'Client-ID': state.clientId,
+          'Authorization': `Bearer ${state.accessToken}`
+        }
+      });
+      if(!res.ok) return { ok:false, data:null, statusText: res.statusText };
+      return { ok:true, data: await res.json() };
+    }
+
+    function setLiveView(live){
+      const nowStr = new Date().toLocaleString();
+      els.lastUpdated.textContent = `Last updated: ${nowStr}`;
+
+      if(live){
+        els.offBanner.style.display='none';
+        els.liveBanner.style.display='block';
+        els.statusTxt.textContent = '🔴 LIVE';
+      }else{
+        els.liveBanner.style.display='none';
+        els.offBanner.style.display='block';
+        els.statusTxt.textContent = '⚫ Offline';
+        els.viewerCount.textContent = '—';
+        els.uptime.textContent = '—';
+        els.title.textContent = '—';
+        els.gameName.textContent = '—';
+      }
+    }
+
+    async function refresh(){
+      const { ok, data, statusText } = await fetchStream(state.user);
+      if(!ok || !data){
+        setLiveView(false);
         return;
       }
-
-      try {
-        const res = await fetch(`https://api.twitch.tv/helix/streams?user_login=${userLogin}`, {
-          headers: {
-            'Client-ID': clientId,
-            'Authorization': `Bearer ${accessToken}`
-          }
-        });
-
-        if (!res.ok) {
-          alert('❌ Twitch API error: ' + res.statusText);
-          return;
-        }
-
-        const data = await res.json();
-        const isLive = data.data && data.data.length > 0;
-        banner.style.display = isLive ? 'block' : 'none';
-        if (!isLive) alert('⚫ Kai Cenat is currently offline.');
-      } catch (err) {
-        console.error(err);
-        alert('Error connecting to Twitch API.');
+      const s = Array.isArray(data.data) && data.data.length ? data.data[0] : null;
+      if(s){
+        setLiveView(true);
+        els.channelName.textContent = s.user_login || state.user;
+        els.viewerCount.textContent = (s.viewer_count ?? 0).toLocaleString?.() || '—';
+        els.uptime.textContent = fmtTime(s.started_at);
+        els.title.textContent = s.title || '—';
+        els.gameName.textContent = s.game_name || '—';
+      }else{
+        setLiveView(false);
       }
+    }
+
+    els.btnApply.addEventListener('click', ()=>{
+      state.user = els.inputUser.value.trim() || 'kaicenat';
+      state.clientId = els.clientId.value.trim();
+      state.accessToken = els.accessToken.value.trim();
+      refresh();
     });
+    els.btnRefresh.addEventListener('click', refresh);
+    els.btnTest.addEventListener('click', async ()=>{
+      // Minimal credentials sanity check
+      if(!els.clientId.value.trim() || !els.accessToken.value.trim()){
+        alert('Enter Client ID and Access Token first.');
+        return;
+      }
+      alert('Credentials added. Click "Refresh Now" to fetch live status.');
+    });
+
+    // Auto-refresh every minute
+    setInterval(refresh, 60_000);
   </script>
 </body>
 </html>
+
