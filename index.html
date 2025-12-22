@@ -10,9 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet" />
 
   <style>
-    /* ===============================
-       ORIGINAL CSS (UNCHANGED)
-       =============================== */
     :root{
       --bg-0:#07070a;
       --bg-1:#0c0b18;
@@ -78,9 +75,6 @@
       .two{ grid-column: span 8; }
     }
 
-    /* ===============================
-       ADDED BUTTON + AUTH STYLES
-       =============================== */
     button{
       background:linear-gradient(180deg,var(--accent),#6f3cff);
       border:none;
@@ -104,7 +98,13 @@
       box-shadow:none;
     }
 
+    button.danger{
+      background:linear-gradient(180deg,#ff3566,#e02855);
+      box-shadow:0 8px 26px rgba(255,53,102,.35);
+    }
+
     button:hover{ transform:translateY(-1px); }
+    button:disabled{ opacity:0.5; cursor:not-allowed; }
 
     input{
       background:#171630;
@@ -113,6 +113,7 @@
       padding:10px 12px;
       color:var(--ink);
       width:100%;
+      font-family:inherit;
     }
 
     .controls{
@@ -129,6 +130,48 @@
       color:var(--muted);
       margin-top:28px;
       font-size:12px;
+    }
+
+    footer a{
+      color:var(--accent-2);
+      text-decoration:none;
+    }
+
+    footer a:hover{
+      text-decoration:underline;
+    }
+
+    .status-indicator{
+      display:inline-block;
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      margin-right:6px;
+    }
+
+    .status-live{
+      background:#ff3566;
+      box-shadow:0 0 10px rgba(255,53,102,.6);
+    }
+
+    .status-offline{
+      background:#9aa3b2;
+    }
+
+    .stream-info{
+      margin-top:12px;
+      padding:12px;
+      background:#171630;
+      border-radius:12px;
+      border:1px solid var(--border);
+    }
+
+    .stream-info > div{
+      margin:6px 0;
+    }
+
+    .stream-info strong{
+      color:var(--accent-2);
     }
   </style>
 </head>
@@ -152,40 +195,51 @@
       <!-- STATUS -->
       <section class="card two">
         <div id="liveBanner" style="display:none">
-          <strong>🔴 LIVE</strong>
-          <div>Channel: <span id="channelName"></span></div>
-          <div>Viewers: <span id="viewerCount"></span></div>
-          <div>Uptime: <span id="uptime"></span></div>
-          <div>Game: <span id="gameName"></span></div>
-          <div>Title: <span id="title"></span></div>
+          <div style="font-size:18px; margin-bottom:12px">
+            <span class="status-indicator status-live"></span>
+            <strong>LIVE NOW</strong>
+          </div>
+          
+          <div class="stream-info">
+            <div><strong>Channel:</strong> <span id="channelName"></span></div>
+            <div><strong>Viewers:</strong> <span id="viewerCount"></span></div>
+            <div><strong>Uptime:</strong> <span id="uptime"></span></div>
+            <div><strong>Game:</strong> <span id="gameName"></span></div>
+            <div><strong>Title:</strong> <span id="title"></span></div>
+          </div>
         </div>
 
         <div id="offBanner" style="display:none">
-          ⚫ Offline
+          <span class="status-indicator status-offline"></span>
+          <strong>Offline</strong>
+          <div class="muted" style="margin-top:8px">Stream is not currently live</div>
         </div>
       </section>
 
       <!-- CONTROLS -->
       <section class="card half">
+        <h3 style="margin-top:0">Check Any Channel</h3>
         <div class="controls">
-          <input id="inputUser" value="kaicenat" />
+          <input id="inputUser" value="kaicenat" placeholder="Enter Twitch username" />
           <button id="btnApply" class="ghost">Apply</button>
           <button id="btnRefresh">Refresh</button>
         </div>
 
-        <hr style="margin:14px 0;border:none;border-top:1px solid var(--border)">
+        <hr style="margin:18px 0;border:none;border-top:1px solid var(--border)">
 
         <!-- AUTH CONTROLS -->
         <div id="authLoggedOut">
-          <a href="http://localhost:5050/auth/twitch">
-            <button class="secondary">Login with Twitch</button>
-          </a>
+          <h3>Personal Features</h3>
+          <p class="muted">Login to quickly check your own channel status</p>
+          <button id="btnLogin" class="secondary">Login with Twitch</button>
         </div>
 
         <div id="authLoggedIn" style="display:none">
+          <h3>Welcome back!</h3>
           <div class="muted">Logged in as <strong id="meName"></strong></div>
           <div class="controls">
             <button id="btnMe">My Channel</button>
+            <button id="btnLogout" class="danger">Logout</button>
           </div>
         </div>
       </section>
@@ -197,7 +251,7 @@
   </div>
 
   <!-- ===============================
-       APP LOGIC (FULL)
+       APP LOGIC (FIXED)
        =============================== -->
   <script>
     const els = {
@@ -213,6 +267,8 @@
       btnApply: document.getElementById('btnApply'),
       btnRefresh: document.getElementById('btnRefresh'),
       btnMe: document.getElementById('btnMe'),
+      btnLogin: document.getElementById('btnLogin'),
+      btnLogout: document.getElementById('btnLogout'),
       authIn: document.getElementById('authLoggedIn'),
       authOut: document.getElementById('authLoggedOut'),
       meName: document.getElementById('meName')
@@ -221,25 +277,30 @@
     let state = { user: 'kaicenat' };
 
     async function refresh(){
-      const res = await fetch(`http://localhost:5050/api/live/${state.user}`);
-      const data = await res.json();
+      try {
+        const res = await fetch(`http://localhost:5050/api/live/${state.user}`);
+        const data = await res.json();
 
-      els.lastUpdated.textContent = `Last updated: ${new Date().toLocaleString()}`;
+        els.lastUpdated.textContent = `Last updated: ${new Date().toLocaleString()}`;
 
-      if(!data.live){
-        els.liveBanner.style.display='none';
-        els.offBanner.style.display='block';
-        return;
+        if(!data.live){
+          els.liveBanner.style.display='none';
+          els.offBanner.style.display='block';
+          return;
+        }
+
+        els.offBanner.style.display='none';
+        els.liveBanner.style.display='block';
+
+        els.channelName.textContent = data.user;
+        els.viewerCount.textContent = data.viewers.toLocaleString();
+        els.uptime.textContent = data.uptime;
+        els.title.textContent = data.title;
+        els.gameName.textContent = data.game;
+      } catch(error) {
+        console.error('Error fetching stream data:', error);
+        els.lastUpdated.textContent = `Error: Could not connect to backend`;
       }
-
-      els.offBanner.style.display='none';
-      els.liveBanner.style.display='block';
-
-      els.channelName.textContent = data.user;
-      els.viewerCount.textContent = data.viewers.toLocaleString();
-      els.uptime.textContent = data.uptime;
-      els.title.textContent = data.title;
-      els.gameName.textContent = data.game;
     }
 
     // PUBLIC CONTROLS
@@ -247,16 +308,36 @@
       state.user = els.inputUser.value.trim() || 'kaicenat';
       refresh();
     };
+    
     els.btnRefresh.onclick = refresh;
 
+    // AUTH CONTROLS
+    els.btnLogin.onclick = () => {
+      window.location.href = 'http://localhost:5050/auth/twitch';
+    };
+
+    els.btnLogout.onclick = async () => {
+      try {
+        await fetch('http://localhost:5050/auth/logout');
+        els.authOut.style.display='block';
+        els.authIn.style.display='none';
+        console.log('Logged out successfully');
+      } catch(error) {
+        console.error('Logout error:', error);
+      }
+    };
+
     // AUTH CHECK
-    fetch("http://localhost:5050/api/me")
+    fetch("http://localhost:5050/api/me", {
+      credentials: 'include'  // ✅ Important for sessions
+    })
       .then(r => r.json())
       .then(data => {
         if(data.logged_in){
           els.authOut.style.display='none';
           els.authIn.style.display='block';
           els.meName.textContent = data.user.display_name;
+          
           els.btnMe.onclick = () => {
             state.user = data.user.login;
             els.inputUser.value = state.user;
@@ -264,10 +345,13 @@
           };
         }
       })
-      .catch(()=>{});
+      .catch((error) => {
+        console.log('Not logged in or error checking auth:', error);
+      });
 
+    // Initial load
     refresh();
-    setInterval(refresh, 60000);
+    setInterval(refresh, 60000);  // Refresh every minute
   </script>
 </body>
 </html>
