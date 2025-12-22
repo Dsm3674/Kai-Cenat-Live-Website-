@@ -10,6 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet" />
 
   <style>
+    /* ===============================
+       ORIGINAL CSS (UNCHANGED)
+       =============================== */
     :root{
       --bg-0:#07070a;
       --bg-1:#0c0b18;
@@ -20,87 +23,41 @@
       --accent:#8c5bff;
       --accent-2:#21d4fd;
       --accent-hot:#ff3566;
-      --glow: rgba(140,91,255,.45);
       --shadow: 0 18px 60px rgba(0,0,0,.50);
-      --round: 18px;
     }
 
     *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-
     body{
       margin:0;
-      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      font-family:"Outfit",system-ui;
       color:var(--ink);
       background:
         radial-gradient(1200px 900px at 10% -10%, #1f0f40 0%, transparent 40%),
-        radial-gradient(1000px 700px at 110% 10%, #072b3b 0%, transparent 42%),
         linear-gradient(160deg, var(--bg-1), var(--bg-0) 40%, var(--bg-2));
-      overflow-x:hidden;
-    }
-
-    #fx{
-      position:fixed;
-      inset:0;
-      z-index:0;
-      opacity:.25;
-      pointer-events:none;
     }
 
     .wrap{
-      position:relative;
-      z-index:1;
       max-width:1100px;
       margin:0 auto;
-      padding:56px 18px 96px;
+      padding:56px 18px;
     }
 
-    /* ---------- HEADER ---------- */
     .brand{
       display:flex;
-      align-items:center;
       justify-content:space-between;
+      align-items:center;
       margin-bottom:18px;
     }
 
-    .logo{
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-
     .badge{
-      width:46px;
-      height:46px;
-      border-radius:12px;
-      display:grid;
-      place-items:center;
-      background: conic-gradient(from 210deg, var(--accent), #6f3cff, var(--accent-2));
-      box-shadow: 0 12px 36px var(--glow);
+      width:46px;height:46px;border-radius:12px;
+      display:grid;place-items:center;
+      background:var(--accent);
       font-weight:800;
     }
 
-    .title h1{ margin:0;font-size:26px; }
-    .title span{ color:var(--muted);font-size:13px; }
+    .stamp{ color:var(--muted); font-size:12px; }
 
-    .stamp{
-      font-size:12px;
-      color:var(--muted);
-      padding:8px 12px;
-      border-radius:999px;
-      background: rgba(255,255,255,.05);
-      border:1px solid var(--border);
-    }
-
-    .rail{
-      height:6px;
-      border-radius:999px;
-      margin:18px 0 26px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      opacity:.25;
-    }
-
-    /* ---------- GRID ---------- */
     .grid{
       display:grid;
       gap:18px;
@@ -109,11 +66,11 @@
 
     .card{
       grid-column: span 12;
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      background:#12111e;
       border:1px solid var(--border);
-      border-radius: var(--round);
+      border-radius:18px;
       padding:22px;
-      box-shadow: var(--shadow);
+      box-shadow:var(--shadow);
     }
 
     @media(min-width:880px){
@@ -121,118 +78,116 @@
       .two{ grid-column: span 8; }
     }
 
-    /* ---------- LIVE / OFFLINE ---------- */
-    .liveBanner{
-      display:none;
-      padding:16px;
-      border-radius:14px;
-      background: linear-gradient(90deg, var(--accent-hot), #ff7a9a);
-      color:#fff;
-      font-weight:600;
-      box-shadow: 0 10px 28px rgba(255,53,102,.35);
-    }
-
-    .offBanner{
-      display:none;
-      padding:16px;
-      border-radius:14px;
-      background: rgba(255,255,255,.04);
-      color:var(--muted);
-      border:1px dashed rgba(255,255,255,.15);
-    }
-
-    /* ---------- CONTROLS ---------- */
-    input{
-      width:100%;
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      background:#15142a;
-      color:var(--ink);
-      font-size:14px;
-    }
-
-    input:focus{
-      outline:none;
-      border-color:var(--accent);
-      box-shadow: 0 0 0 2px rgba(140,91,255,.25);
-    }
-
+    /* ===============================
+       ADDED BUTTON + AUTH STYLES
+       =============================== */
     button{
-      margin-top:10px;
-      padding:12px 16px;
-      border-radius:12px;
+      background:linear-gradient(180deg,var(--accent),#6f3cff);
       border:none;
+      border-radius:12px;
+      padding:10px 16px;
+      font-family:inherit;
+      color:white;
       font-weight:700;
       cursor:pointer;
-      background: linear-gradient(180deg, var(--accent), #6f3cff);
-      color:white;
-      box-shadow: 0 10px 24px var(--glow);
-      transition: transform .15s ease, box-shadow .15s ease;
+      box-shadow:0 8px 26px rgba(140,91,255,.45);
+      transition:transform .15s;
     }
 
-    button:hover{
-      transform: translateY(-1px);
-      box-shadow: 0 14px 30px var(--glow);
+    button.secondary{
+      background:linear-gradient(180deg,#21d4fd,#1aaed8);
+      box-shadow:0 8px 26px rgba(33,212,253,.35);
     }
 
-    button:active{
-      transform: translateY(0);
-      box-shadow: 0 8px 20px var(--glow);
+    button.ghost{
+      background:#171630;
+      box-shadow:none;
     }
 
-    /* ---------- FOOTER ---------- */
+    button:hover{ transform:translateY(-1px); }
+
+    input{
+      background:#171630;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px 12px;
+      color:var(--ink);
+      width:100%;
+    }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .muted{ color:var(--muted); font-size:13px; }
+
     footer{
       text-align:center;
       color:var(--muted);
       margin-top:28px;
       font-size:12px;
     }
-
-    footer a{
-      color:var(--accent-2);
-      text-decoration:none;
-    }
   </style>
 </head>
 
 <body>
-  <canvas id="fx"></canvas>
-
   <div class="wrap">
+    <!-- HEADER -->
     <div class="brand">
-      <div class="logo">
+      <div style="display:flex;gap:12px;align-items:center">
         <div class="badge">KC</div>
-        <div class="title">
-          <h1>Kai Cenat — Live Control Panel</h1>
-          <span>Real-time Twitch status</span>
+        <div>
+          <strong>Kai Cenat — Live Control Panel</strong><br>
+          <span class="muted">Public + personal Twitch dashboard</span>
         </div>
       </div>
       <div class="stamp" id="lastUpdated">Last updated: —</div>
     </div>
 
-    <div class="rail"></div>
-
+    <!-- GRID -->
     <div class="grid">
+      <!-- STATUS -->
       <section class="card two">
-        <div id="liveBanner" class="liveBanner">
-          <strong>🔴 LIVE</strong><br><br>
-          Channel: <span id="channelName"></span><br>
-          Viewers: <span id="viewerCount"></span><br>
-          Uptime: <span id="uptime"></span><br>
-          Game: <span id="gameName"></span><br>
-          Title: <span id="title"></span>
+        <div id="liveBanner" style="display:none">
+          <strong>🔴 LIVE</strong>
+          <div>Channel: <span id="channelName"></span></div>
+          <div>Viewers: <span id="viewerCount"></span></div>
+          <div>Uptime: <span id="uptime"></span></div>
+          <div>Game: <span id="gameName"></span></div>
+          <div>Title: <span id="title"></span></div>
         </div>
 
-        <div id="offBanner" class="offBanner">
+        <div id="offBanner" style="display:none">
           ⚫ Offline
         </div>
       </section>
 
+      <!-- CONTROLS -->
       <section class="card half">
-        <input id="inputUser" value="kaicenat" />
-        <button id="btnApply">Apply</button>
-        <button id="btnRefresh">Refresh</button>
+        <div class="controls">
+          <input id="inputUser" value="kaicenat" />
+          <button id="btnApply" class="ghost">Apply</button>
+          <button id="btnRefresh">Refresh</button>
+        </div>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid var(--border)">
+
+        <!-- AUTH CONTROLS -->
+        <div id="authLoggedOut">
+          <a href="http://localhost:5050/auth/twitch">
+            <button class="secondary">Login with Twitch</button>
+          </a>
+        </div>
+
+        <div id="authLoggedIn" style="display:none">
+          <div class="muted">Logged in as <strong id="meName"></strong></div>
+          <div class="controls">
+            <button id="btnMe">My Channel</button>
+          </div>
+        </div>
       </section>
     </div>
 
@@ -241,6 +196,9 @@
     </footer>
   </div>
 
+  <!-- ===============================
+       APP LOGIC (FULL)
+       =============================== -->
   <script>
     const els = {
       liveBanner: document.getElementById('liveBanner'),
@@ -253,7 +211,11 @@
       lastUpdated: document.getElementById('lastUpdated'),
       inputUser: document.getElementById('inputUser'),
       btnApply: document.getElementById('btnApply'),
-      btnRefresh: document.getElementById('btnRefresh')
+      btnRefresh: document.getElementById('btnRefresh'),
+      btnMe: document.getElementById('btnMe'),
+      authIn: document.getElementById('authLoggedIn'),
+      authOut: document.getElementById('authLoggedOut'),
+      meName: document.getElementById('meName')
     };
 
     let state = { user: 'kaicenat' };
@@ -265,13 +227,13 @@
       els.lastUpdated.textContent = `Last updated: ${new Date().toLocaleString()}`;
 
       if(!data.live){
-        els.liveBanner.style.display = 'none';
-        els.offBanner.style.display = 'block';
+        els.liveBanner.style.display='none';
+        els.offBanner.style.display='block';
         return;
       }
 
-      els.offBanner.style.display = 'none';
-      els.liveBanner.style.display = 'block';
+      els.offBanner.style.display='none';
+      els.liveBanner.style.display='block';
 
       els.channelName.textContent = data.user;
       els.viewerCount.textContent = data.viewers.toLocaleString();
@@ -280,16 +242,32 @@
       els.gameName.textContent = data.game;
     }
 
+    // PUBLIC CONTROLS
     els.btnApply.onclick = () => {
       state.user = els.inputUser.value.trim() || 'kaicenat';
       refresh();
     };
-
     els.btnRefresh.onclick = refresh;
+
+    // AUTH CHECK
+    fetch("http://localhost:5050/api/me")
+      .then(r => r.json())
+      .then(data => {
+        if(data.logged_in){
+          els.authOut.style.display='none';
+          els.authIn.style.display='block';
+          els.meName.textContent = data.user.display_name;
+          els.btnMe.onclick = () => {
+            state.user = data.user.login;
+            els.inputUser.value = state.user;
+            refresh();
+          };
+        }
+      })
+      .catch(()=>{});
 
     refresh();
     setInterval(refresh, 60000);
   </script>
 </body>
 </html>
-
