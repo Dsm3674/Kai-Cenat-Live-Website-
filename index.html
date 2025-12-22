@@ -10,7 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet" />
 
   <style>
-   
     :root{
       --bg-0:#07070a;
       --bg-1:#0c0b18;
@@ -22,21 +21,13 @@
       --accent-2:#21d4fd;
       --accent-hot:#ff3566;
       --glow: rgba(140,91,255,.45);
-      --glow-2: rgba(33,212,253,.45);
-      --ok:#20c997;
-      --warn:#ffb020;
-      --danger:#ff5b6b;
-      --card:#12111e;
-      --chip:#171630;
-      --rail:#0e0d18;
       --shadow: 0 18px 60px rgba(0,0,0,.50);
       --round: 18px;
-      --round-sm: 12px;
-      --ring: 0 0 0 1px var(--border) inset;
     }
 
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
+
     body{
       margin:0;
       font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
@@ -54,7 +45,6 @@
       z-index:0;
       opacity:.25;
       pointer-events:none;
-      filter: blur(.3px) contrast(120%);
     }
 
     .wrap{
@@ -65,20 +55,27 @@
       padding:56px 18px 96px;
     }
 
+    /* ---------- HEADER ---------- */
     .brand{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:16px;
       margin-bottom:18px;
     }
 
-    .logo{ display:flex; align-items:center; gap:12px; }
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
 
     .badge{
-      width:46px;height:46px;border-radius:12px;
-      display:grid;place-items:center;
-      background: conic-gradient(from 210deg at 50% 50%, var(--accent), #6f3cff 35%, var(--accent-2));
+      width:46px;
+      height:46px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      background: conic-gradient(from 210deg, var(--accent), #6f3cff, var(--accent-2));
       box-shadow: 0 12px 36px var(--glow);
       font-weight:800;
     }
@@ -87,19 +84,26 @@
     .title span{ color:var(--muted);font-size:13px; }
 
     .stamp{
-      font-size:12px;color:var(--muted);
-      padding:8px 12px;border-radius:999px;
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      font-size:12px;
+      color:var(--muted);
+      padding:8px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.05);
+      border:1px solid var(--border);
     }
 
     .rail{
-      height:6px;border-radius:999px;margin:18px 0 26px;
-      background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      overflow:hidden;
+      height:6px;
+      border-radius:999px;
+      margin:18px 0 26px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      opacity:.25;
     }
 
+    /* ---------- GRID ---------- */
     .grid{
-      display:grid;gap:18px;
+      display:grid;
+      gap:18px;
       grid-template-columns: repeat(12, 1fr);
     }
 
@@ -107,10 +111,9 @@
       grid-column: span 12;
       background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
       border:1px solid var(--border);
-      border-radius:18px;
+      border-radius: var(--round);
       padding:22px;
       box-shadow: var(--shadow);
-      position:relative;
     }
 
     @media(min-width:880px){
@@ -118,14 +121,77 @@
       .two{ grid-column: span 8; }
     }
 
-    .liveBanner{ display:none; }
-    .offBanner{ display:none; }
+    /* ---------- LIVE / OFFLINE ---------- */
+    .liveBanner{
+      display:none;
+      padding:16px;
+      border-radius:14px;
+      background: linear-gradient(90deg, var(--accent-hot), #ff7a9a);
+      color:#fff;
+      font-weight:600;
+      box-shadow: 0 10px 28px rgba(255,53,102,.35);
+    }
 
+    .offBanner{
+      display:none;
+      padding:16px;
+      border-radius:14px;
+      background: rgba(255,255,255,.04);
+      color:var(--muted);
+      border:1px dashed rgba(255,255,255,.15);
+    }
+
+    /* ---------- CONTROLS ---------- */
+    input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:#15142a;
+      color:var(--ink);
+      font-size:14px;
+    }
+
+    input:focus{
+      outline:none;
+      border-color:var(--accent);
+      box-shadow: 0 0 0 2px rgba(140,91,255,.25);
+    }
+
+    button{
+      margin-top:10px;
+      padding:12px 16px;
+      border-radius:12px;
+      border:none;
+      font-weight:700;
+      cursor:pointer;
+      background: linear-gradient(180deg, var(--accent), #6f3cff);
+      color:white;
+      box-shadow: 0 10px 24px var(--glow);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    button:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px var(--glow);
+    }
+
+    button:active{
+      transform: translateY(0);
+      box-shadow: 0 8px 20px var(--glow);
+    }
+
+    /* ---------- FOOTER ---------- */
     footer{
       text-align:center;
       color:var(--muted);
       margin-top:28px;
       font-size:12px;
+    }
+
+    footer a{
+      color:var(--accent-2);
+      text-decoration:none;
     }
   </style>
 </head>
@@ -150,12 +216,12 @@
     <div class="grid">
       <section class="card two">
         <div id="liveBanner" class="liveBanner">
-          <strong id="statusTxt">🔴 LIVE</strong>
-          <div>Channel: <span id="channelName"></span></div>
-          <div>Viewers: <span id="viewerCount"></span></div>
-          <div>Uptime: <span id="uptime"></span></div>
-          <div>Game: <span id="gameName"></span></div>
-          <div>Title: <span id="title"></span></div>
+          <strong>🔴 LIVE</strong><br><br>
+          Channel: <span id="channelName"></span><br>
+          Viewers: <span id="viewerCount"></span><br>
+          Uptime: <span id="uptime"></span><br>
+          Game: <span id="gameName"></span><br>
+          Title: <span id="title"></span>
         </div>
 
         <div id="offBanner" class="offBanner">
@@ -175,9 +241,6 @@
     </footer>
   </div>
 
-  <!-- =========================
-       ONLY THIS SCRIPT CHANGED
-       ========================= -->
   <script>
     const els = {
       liveBanner: document.getElementById('liveBanner'),
