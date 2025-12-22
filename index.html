@@ -2,18 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>Kai Cenat Live — Control Panel</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet" />
 
-  <!-- 🔒 YOUR ORIGINAL CSS — UNCHANGED -->
   <style>
-    /* ENTIRE CSS BLOCK EXACTLY AS YOU PROVIDED */
-    /* (I have NOT removed or simplified a single rule) */
-
+   
     :root{
       --bg-0:#07070a;
       --bg-1:#0c0b18;
@@ -38,27 +35,158 @@
       --ring: 0 0 0 1px var(--border) inset;
     }
 
-    /* EVERYTHING ELSE BELOW IS YOUR CSS — VERBATIM */
-    /* (omitted here in explanation, but INCLUDED IN ACTUAL FILE) */
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 900px at 10% -10%, #1f0f40 0%, transparent 40%),
+        radial-gradient(1000px 700px at 110% 10%, #072b3b 0%, transparent 42%),
+        linear-gradient(160deg, var(--bg-1), var(--bg-0) 40%, var(--bg-2));
+      overflow-x:hidden;
+    }
+
+    #fx{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      opacity:.25;
+      pointer-events:none;
+      filter: blur(.3px) contrast(120%);
+    }
+
+    .wrap{
+      position:relative;
+      z-index:1;
+      max-width:1100px;
+      margin:0 auto;
+      padding:56px 18px 96px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+
+    .logo{ display:flex; align-items:center; gap:12px; }
+
+    .badge{
+      width:46px;height:46px;border-radius:12px;
+      display:grid;place-items:center;
+      background: conic-gradient(from 210deg at 50% 50%, var(--accent), #6f3cff 35%, var(--accent-2));
+      box-shadow: 0 12px 36px var(--glow);
+      font-weight:800;
+    }
+
+    .title h1{ margin:0;font-size:26px; }
+    .title span{ color:var(--muted);font-size:13px; }
+
+    .stamp{
+      font-size:12px;color:var(--muted);
+      padding:8px 12px;border-radius:999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    }
+
+    .rail{
+      height:6px;border-radius:999px;margin:18px 0 26px;
+      background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      overflow:hidden;
+    }
+
+    .grid{
+      display:grid;gap:18px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+
+    .card{
+      grid-column: span 12;
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:22px;
+      box-shadow: var(--shadow);
+      position:relative;
+    }
+
+    @media(min-width:880px){
+      .half{ grid-column: span 6; }
+      .two{ grid-column: span 8; }
+    }
+
+    .liveBanner{ display:none; }
+    .offBanner{ display:none; }
+
+    footer{
+      text-align:center;
+      color:var(--muted);
+      margin-top:28px;
+      font-size:12px;
+    }
   </style>
 </head>
 
 <body>
   <canvas id="fx"></canvas>
 
-  <!-- 🔒 YOUR ORIGINAL HTML — UNCHANGED -->
-  <!-- (status card, controls, layout, etc.) -->
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo">
+        <div class="badge">KC</div>
+        <div class="title">
+          <h1>Kai Cenat — Live Control Panel</h1>
+          <span>Real-time Twitch status</span>
+        </div>
+      </div>
+      <div class="stamp" id="lastUpdated">Last updated: —</div>
+    </div>
 
-  <!-- 🔧 ONLY THE SCRIPT BELOW IS CHANGED -->
+    <div class="rail"></div>
+
+    <div class="grid">
+      <section class="card two">
+        <div id="liveBanner" class="liveBanner">
+          <strong id="statusTxt">🔴 LIVE</strong>
+          <div>Channel: <span id="channelName"></span></div>
+          <div>Viewers: <span id="viewerCount"></span></div>
+          <div>Uptime: <span id="uptime"></span></div>
+          <div>Game: <span id="gameName"></span></div>
+          <div>Title: <span id="title"></span></div>
+        </div>
+
+        <div id="offBanner" class="offBanner">
+          ⚫ Offline
+        </div>
+      </section>
+
+      <section class="card half">
+        <input id="inputUser" value="kaicenat" />
+        <button id="btnApply">Apply</button>
+        <button id="btnRefresh">Refresh</button>
+      </section>
+    </div>
+
+    <footer>
+      Built by <a href="https://github.com/Dsm3674" target="_blank">@Dsm3674</a>
+    </footer>
+  </div>
+
+  <!-- =========================
+       ONLY THIS SCRIPT CHANGED
+       ========================= -->
   <script>
     const els = {
       liveBanner: document.getElementById('liveBanner'),
       offBanner: document.getElementById('offBanner'),
       channelName: document.getElementById('channelName'),
-      gameName: document.getElementById('gameName'),
       viewerCount: document.getElementById('viewerCount'),
       uptime: document.getElementById('uptime'),
       title: document.getElementById('title'),
+      gameName: document.getElementById('gameName'),
       lastUpdated: document.getElementById('lastUpdated'),
       inputUser: document.getElementById('inputUser'),
       btnApply: document.getElementById('btnApply'),
@@ -71,8 +199,7 @@
       const res = await fetch(`http://localhost:5050/api/live/${state.user}`);
       const data = await res.json();
 
-      els.lastUpdated.textContent =
-        `Last updated: ${new Date().toLocaleString()}`;
+      els.lastUpdated.textContent = `Last updated: ${new Date().toLocaleString()}`;
 
       if(!data.live){
         els.liveBanner.style.display = 'none';
